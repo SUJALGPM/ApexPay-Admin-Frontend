@@ -28,56 +28,78 @@ export default async function NotificationsPage({
   const res = await adminApiFetchServer<NotificationRes>(`/notifications?${qs.toString()}`, { method: "GET" });
 
   return (
-    <div style={{ maxWidth: 1400 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Notifications</h1>
+    <div className="ap-container" style={{ maxWidth: 1400 }}>
+      <div className="ap-title ap-titleGradient">Notifications</div>
+      <div className="ap-subtitle">System events and user notifications (server sourced).</div>
 
-      <form method="get" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, alignItems: "end", marginBottom: 14 }}>
-        <div>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>User ID</div>
-          <input name="user_id" defaultValue={qp(sp, "user_id") ?? ""} style={{ width: "100%" }} />
+      <form method="get" className="ap-card ap-glowBorder" style={{ marginTop: 14 }}>
+        <div className="ap-cardInner">
+          <div className="ap-filterGrid">
+            <div className="ap-filterColWide">
+              <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>User ID</div>
+              <input name="user_id" defaultValue={qp(sp, "user_id") ?? ""} className="ap-input" />
+            </div>
+            <div className="ap-filterColWide">
+              <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>Type</div>
+              <input name="type" defaultValue={qp(sp, "type") ?? ""} className="ap-input" />
+            </div>
+            <div className="ap-filterColWide">
+              <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>From (ISO)</div>
+              <input name="from" defaultValue={qp(sp, "from") ?? ""} className="ap-input" />
+            </div>
+            <div className="ap-filterActions">
+              <button className="ap-button ap-buttonPrimary" style={{ width: "100%" }}>
+                Apply
+              </button>
+            </div>
+          </div>
         </div>
-        <div>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>Type</div>
-          <input name="type" defaultValue={qp(sp, "type") ?? ""} style={{ width: "100%" }} />
-        </div>
-        <div>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>From (ISO)</div>
-          <input name="from" defaultValue={qp(sp, "from") ?? ""} style={{ width: "100%" }} />
-        </div>
-        <button style={{ padding: "10px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.06)", cursor: "pointer", color: "inherit", fontWeight: 700 }}>
-          Apply
-        </button>
       </form>
 
       {!res.ok ? (
-        <div style={{ color: "#ff4d4d" }}>{res.error.message}</div>
+        <div className="ap-card ap-glowBorder" style={{ marginTop: 14 }}>
+          <div className="ap-cardInner ap-alert ap-alertError">{res.error.message}</div>
+        </div>
       ) : (
         <>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 8 }}>
+          <div className="ap-subtitle" style={{ marginTop: 12 }}>
             Range: {new Date(res.data.range.from).toLocaleString()} → {new Date(res.data.range.to).toLocaleString()}
           </div>
-          <div style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, overflow: "hidden" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead style={{ background: "rgba(255,255,255,0.04)" }}>
-                <tr>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Created</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Type</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>User</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>ID</th>
-                </tr>
-              </thead>
-              <tbody>
-                {res.data.items.map((n) => (
-                  <tr key={n.id} style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                    <td style={{ padding: 10, fontSize: 12 }}>{new Date(n.created_at).toLocaleString()}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{n.type}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{n.user_id ?? "-"}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{n.id}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+
+          {res.data.items.length === 0 ? (
+            <div className="ap-card ap-glowBorder" style={{ marginTop: 12 }}>
+              <div className="ap-cardInner ap-alert" style={{ color: "var(--muted)" }}>
+                No notifications found for the current filters.
+              </div>
+            </div>
+          ) : (
+            <div className="ap-card ap-glowBorder ap-tableWrap" style={{ marginTop: 12 }}>
+              <div className="ap-cardInner">
+                <table className="ap-table">
+                  <thead className="ap-thead">
+                    <tr>
+                      <th>Created</th>
+                      <th>Type</th>
+                      <th>User</th>
+                      <th>ID</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {res.data.items.map((n) => (
+                      <tr key={n.id} className="ap-row">
+                        <td>{new Date(n.created_at).toLocaleString()}</td>
+                        <td>
+                          <span className="ap-pill">{n.type}</span>
+                        </td>
+                        <td>{n.user_id ?? "-"}</td>
+                        <td style={{ opacity: 0.85 }}>{n.id}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

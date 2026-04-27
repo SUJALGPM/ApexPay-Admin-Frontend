@@ -39,24 +39,16 @@ export function ReceiverFlagToggle({
   }
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
       <button
         disabled={disabled || loading}
         onClick={toggle}
-        style={{
-          padding: "6px 10px",
-          borderRadius: 8,
-          border: "1px solid rgba(255,255,255,0.12)",
-          background: flagged ? "rgba(255,77,77,0.15)" : "rgba(34,197,94,0.15)",
-          color: "inherit",
-          cursor: disabled || loading ? "not-allowed" : "pointer",
-          fontWeight: 700
-        }}
+        className={`ap-button ${flagged ? "ap-buttonDanger" : "ap-buttonSuccess"}`}
+        style={{ padding: "8px 12px" }}
       >
         {loading ? "Saving..." : flagged ? "Unflag" : "Flag"}
       </button>
-      {error ? <span style={{ color: "#ff4d4d", fontSize: 12 }}>{error}</span> : null}
+      {error ? <span className="ap-alert ap-alertError">{error}</span> : null}
     </div>
   );
 }
-

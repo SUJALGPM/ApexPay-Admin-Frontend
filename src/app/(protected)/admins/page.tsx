@@ -10,44 +10,57 @@ export default async function AdminsPage() {
   const res = await adminApiFetchServer<AdminsRes>("/admins?limit=50", { method: "GET" });
 
   return (
-    <div style={{ maxWidth: 1200 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Admins</h1>
+    <div className="ap-container" style={{ maxWidth: 1200 }}>
+      <div className="ap-title ap-titleGradient">Admins</div>
+      <div className="ap-subtitle">Manage admin access and roles (super_admin only).</div>
 
       {me?.role !== "super_admin" ? (
-        <div style={{ color: "#ff4d4d" }}>Forbidden for your role.</div>
+        <div className="ap-card ap-glowBorder" style={{ marginTop: 14 }}>
+          <div className="ap-cardInner ap-alert ap-alertError">Forbidden for your role.</div>
+        </div>
       ) : (
         <>
-          <section style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: 12, marginBottom: 12 }}>
-            <div style={{ fontWeight: 800, marginBottom: 10 }}>Create Admin</div>
-            <CreateAdminForm />
+          <section className="ap-card ap-glowBorder" style={{ marginTop: 14 }}>
+            <div className="ap-cardInner">
+              <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>Create Admin</div>
+              <CreateAdminForm />
+            </div>
           </section>
 
-          <section style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, overflow: "hidden" }}>
-            <div style={{ padding: 12, borderBottom: "1px solid rgba(255,255,255,0.12)", fontWeight: 800 }}>Admin List</div>
-            {!res.ok ? (
-              <div style={{ padding: 12, color: "#ff4d4d" }}>{res.error.message}</div>
-            ) : (
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead style={{ background: "rgba(255,255,255,0.04)" }}>
-                  <tr>
-                    <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Created</th>
-                    <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Email</th>
-                    <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Role</th>
-                    <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>ID</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {res.data.items.map((a) => (
-                    <tr key={a.id} style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                      <td style={{ padding: 10, fontSize: 12 }}>{new Date(a.created_at).toLocaleString()}</td>
-                      <td style={{ padding: 10, fontSize: 12 }}>{a.email}</td>
-                      <td style={{ padding: 10, fontSize: 12 }}>{a.role}</td>
-                      <td style={{ padding: 10, fontSize: 12 }}>{a.id}</td>
+          <section className="ap-card ap-glowBorder ap-tableWrap" style={{ marginTop: 14 }}>
+            <div className="ap-cardInner">
+              <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>Admin List</div>
+              {!res.ok ? (
+                <div className="ap-alert ap-alertError">{res.error.message}</div>
+              ) : res.data.items.length === 0 ? (
+                <div className="ap-alert" style={{ color: "var(--muted)" }}>
+                  No admins found.
+                </div>
+              ) : (
+                <table className="ap-table">
+                  <thead className="ap-thead">
+                    <tr>
+                      <th>Created</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>ID</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                  </thead>
+                  <tbody>
+                    {res.data.items.map((a) => (
+                      <tr key={a.id} className="ap-row">
+                        <td>{new Date(a.created_at).toLocaleString()}</td>
+                        <td>{a.email}</td>
+                        <td>
+                          <span className="ap-pill">{a.role}</span>
+                        </td>
+                        <td style={{ opacity: 0.85 }}>{a.id}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </section>
         </>
       )}

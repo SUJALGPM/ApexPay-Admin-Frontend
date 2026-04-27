@@ -40,72 +40,81 @@ export default async function UsersPage({
   const txRes = userId ? await adminApiFetchServer<UserTxnsResponse>(`/users/${userId}/transactions`, { method: "GET" }) : null;
 
   return (
-    <div style={{ maxWidth: 1400 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Users</h1>
+    <div className="ap-container" style={{ maxWidth: 1400 }}>
+      <div className="ap-title ap-titleGradient">Users</div>
+      <div className="ap-subtitle">User intelligence: accounts, VPAs, and recent transactions.</div>
 
       {!listRes.ok ? (
-        <div style={{ color: "#ff4d4d" }}>{listRes.error.message}</div>
+        <div className="ap-card ap-glowBorder" style={{ marginTop: 14 }}>
+          <div className="ap-cardInner ap-alert ap-alertError">{listRes.error.message}</div>
+        </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <section style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, overflow: "hidden" }}>
-            <div style={{ padding: 12, borderBottom: "1px solid rgba(255,255,255,0.12)", fontWeight: 800 }}>
-              User List
+        <div className="ap-twoCol" style={{ marginTop: 14 }}>
+          <section className="ap-card ap-glowBorder">
+            <div className="ap-cardInner">
+              <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>User List</div>
+              {listRes.data.items.length === 0 ? (
+                <div className="ap-alert" style={{ color: "var(--muted)" }}>
+                  No users found.
+                </div>
+              ) : (
+                <table className="ap-table">
+                  <thead className="ap-thead">
+                    <tr>
+                      <th>Created</th>
+                      <th>Mobile</th>
+                      <th>Name</th>
+                      <th>User</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {listRes.data.items.map((u) => (
+                      <tr key={u.id} className="ap-row">
+                        <td>{new Date(u.created_at).toLocaleString()}</td>
+                        <td>{u.mobile_number ?? "-"}</td>
+                        <td>{u.full_name ?? "-"}</td>
+                        <td>
+                          <Link href={`/users?user_id=${u.id}`} style={{ textDecoration: "underline" }}>
+                            {u.id}
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              {listRes.data.page.nextCursor ? (
+                <div style={{ marginTop: 10 }}>
+                  <Link className="ap-button" href={`/users?cursor=${listRes.data.page.nextCursor}`}>
+                    Load more →
+                  </Link>
+                </div>
+              ) : null}
             </div>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead style={{ background: "rgba(255,255,255,0.04)" }}>
-                <tr>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Created</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Mobile</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Name</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>User</th>
-                </tr>
-              </thead>
-              <tbody>
-                {listRes.data.items.map((u) => (
-                  <tr key={u.id} style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                    <td style={{ padding: 10, fontSize: 12 }}>{new Date(u.created_at).toLocaleString()}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{u.mobile_number ?? "-"}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{u.full_name ?? "-"}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>
-                      <Link href={`/users?user_id=${u.id}`}>{u.id}</Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {listRes.data.page.nextCursor ? (
-              <div style={{ padding: 12 }}>
-                <Link href={`/users?cursor=${listRes.data.page.nextCursor}`}>Load more →</Link>
-              </div>
-            ) : null}
           </section>
 
-          <section style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, overflow: "hidden" }}>
-            <div style={{ padding: 12, borderBottom: "1px solid rgba(255,255,255,0.12)", fontWeight: 800 }}>
-              User Intelligence
-            </div>
-            <div style={{ padding: 12 }}>
+          <section className="ap-card ap-glowBorder">
+            <div className="ap-cardInner">
+              <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>User Intelligence</div>
               {!userId ? (
-                <div style={{ opacity: 0.75, fontSize: 12 }}>Select a user to view accounts, VPAs, and transactions.</div>
+                <div className="ap-alert" style={{ color: "var(--muted)" }}>
+                  Select a user to view accounts, VPAs, and transactions.
+                </div>
               ) : !detailRes ? null : !detailRes.ok ? (
-                <div style={{ color: "#ff4d4d" }}>{detailRes.error.message}</div>
+                <div className="ap-alert ap-alertError">{detailRes.error.message}</div>
               ) : (
                 <>
-                  <div style={{ fontWeight: 800, marginBottom: 6 }}>User</div>
+                  <div style={{ fontWeight: 900, marginBottom: 8 }}>User</div>
                   <JsonBlock value={detailRes.data.user} />
 
-                  <div style={{ fontWeight: 800, marginTop: 12, marginBottom: 6 }}>Accounts</div>
+                  <div style={{ fontWeight: 900, marginTop: 14, marginBottom: 8 }}>Accounts</div>
                   <JsonBlock value={detailRes.data.accounts} />
 
-                  <div style={{ fontWeight: 800, marginTop: 12, marginBottom: 6 }}>VPAs</div>
+                  <div style={{ fontWeight: 900, marginTop: 14, marginBottom: 8 }}>VPAs</div>
                   <JsonBlock value={detailRes.data.vpas} />
 
-                  <div style={{ fontWeight: 800, marginTop: 12, marginBottom: 6 }}>Transactions (last 7 days)</div>
-                  {!txRes ? null : !txRes.ok ? (
-                    <div style={{ color: "#ff4d4d" }}>{txRes.error.message}</div>
-                  ) : (
-                    <JsonBlock value={txRes.data.items} />
-                  )}
+                  <div style={{ fontWeight: 900, marginTop: 14, marginBottom: 8 }}>Transactions (last 7 days)</div>
+                  {!txRes ? null : !txRes.ok ? <div className="ap-alert ap-alertError">{txRes.error.message}</div> : <JsonBlock value={txRes.data.items} />}
                 </>
               )}
             </div>

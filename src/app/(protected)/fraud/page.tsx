@@ -51,116 +51,122 @@ export default async function FraudPage({
   ]);
 
   return (
-    <div style={{ maxWidth: 1400 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Fraud Analytics</h1>
+    <div className="ap-container" style={{ maxWidth: 1400 }}>
+      <div className="ap-title ap-titleGradient">Fraud Analytics</div>
+      <div className="ap-subtitle">Live risk signals, high-risk transactions, and suspicious receiver controls.</div>
 
-      <section style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
-        <div style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: 12 }}>
-          <div style={{ fontWeight: 800, marginBottom: 8 }}>Risk Score Distribution (Decision)</div>
-          {!dashRes.ok ? (
-            <div style={{ color: "#ff4d4d" }}>{dashRes.error.message}</div>
-          ) : (
-            <BreakdownBarChart data={dashRes.data.riskDistribution} xKey="decision" yKey="count" />
-          )}
+      <section className="ap-twoCol" style={{ marginTop: 14 }}>
+        <div className="ap-card ap-glowBorder">
+          <div className="ap-cardInner">
+            <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>Risk Distribution</div>
+            {!dashRes.ok ? <div className="ap-alert ap-alertError">{dashRes.error.message}</div> : <BreakdownBarChart data={dashRes.data.riskDistribution} xKey="decision" yKey="count" />}
+          </div>
         </div>
-        <div style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: 12 }}>
-          <div style={{ fontWeight: 800, marginBottom: 8 }}>Fraud Type Breakdown</div>
-          {!dashRes.ok ? (
-            <div style={{ color: "#ff4d4d" }}>{dashRes.error.message}</div>
+        <div className="ap-card ap-glowBorder">
+          <div className="ap-cardInner">
+            <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>Fraud Type Breakdown</div>
+            {!dashRes.ok ? <div className="ap-alert ap-alertError">{dashRes.error.message}</div> : <BreakdownBarChart data={dashRes.data.fraudTypes} xKey="fraud_type" yKey="count" />}
+          </div>
+        </div>
+      </section>
+
+      <section className="ap-card ap-glowBorder ap-tableWrap" style={{ marginTop: 14 }}>
+        <div className="ap-cardInner">
+          <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>High-risk Transactions</div>
+          {!highRiskRes.ok ? (
+            <div className="ap-alert ap-alertError">{highRiskRes.error.message}</div>
+          ) : highRiskRes.data.items.length === 0 ? (
+            <div className="ap-alert" style={{ color: "var(--muted)" }}>
+              No high-risk transactions found for the selected range.
+            </div>
           ) : (
-            <BreakdownBarChart data={dashRes.data.fraudTypes} xKey="fraud_type" yKey="count" />
+            <table className="ap-table">
+              <thead className="ap-thead">
+                <tr>
+                  <th>Created</th>
+                  <th>Txn</th>
+                  <th>Status</th>
+                  <th>Decision</th>
+                  <th>Risk</th>
+                  <th>Fraud Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                {highRiskRes.data.items.map((row, idx) => {
+                  const id = asString(row["id"]);
+                  const createdAt = asString(row["created_at"]);
+                  const status = asString(row["status"]);
+                  const decision = asString(row["decision"]);
+                  const riskScore = row["risk_score"];
+                  const fraudType = asString(row["fraud_type"]);
+                  return (
+                    <tr key={id ?? `${createdAt ?? "na"}-${idx}`} className="ap-row">
+                      <td>{createdAt ? new Date(createdAt).toLocaleString() : "-"}</td>
+                      <td>
+                        {id ? (
+                          <Link href={`/transactions/${id}`} style={{ textDecoration: "underline" }}>
+                            {id}
+                          </Link>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td>{status ?? "-"}</td>
+                      <td>
+                        <RiskBadge decision={decision} />
+                      </td>
+                      <td>{typeof riskScore === "number" ? riskScore : "-"}</td>
+                      <td>{fraudType ?? "-"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           )}
         </div>
       </section>
 
-      <section style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, overflow: "hidden", marginBottom: 12 }}>
-        <div style={{ padding: 12, borderBottom: "1px solid rgba(255,255,255,0.12)", fontWeight: 800 }}>
-          High-risk Transactions
+      <section className="ap-card ap-glowBorder ap-tableWrap" style={{ marginTop: 14 }}>
+        <div className="ap-cardInner">
+          <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>Suspicious Receivers (flagged)</div>
+          {!flaggedRes.ok ? (
+            <div className="ap-alert ap-alertError">{flaggedRes.error.message}</div>
+          ) : flaggedRes.data.items.length === 0 ? (
+            <div className="ap-alert" style={{ color: "var(--muted)" }}>
+              No flagged receivers at the moment.
+            </div>
+          ) : (
+            <table className="ap-table">
+              <thead className="ap-thead">
+                <tr>
+                  <th>Receiver</th>
+                  <th>Updated</th>
+                  <th>Flagged</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {flaggedRes.data.items.map((rp, idx) => {
+                  const receiverUserId = asString(rp["receiver_user_id"]);
+                  const updatedAt = asString(rp["updated_at"]);
+                  const flagged = asBool(rp["flagged"]);
+                  return (
+                    <tr key={receiverUserId ?? `${updatedAt ?? "na"}-${idx}`} className="ap-row">
+                      <td>{receiverUserId ?? "-"}</td>
+                      <td>{updatedAt ? new Date(updatedAt).toLocaleString() : "-"}</td>
+                      <td>{flagged ? "true" : "false"}</td>
+                      <td>
+                        {receiverUserId ? (
+                          <ReceiverFlagToggle receiverId={receiverUserId} initialFlagged={flagged} disabled={admin?.role !== "super_admin"} />
+                        ) : null}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
-        {!highRiskRes.ok ? (
-          <div style={{ padding: 12, color: "#ff4d4d" }}>{highRiskRes.error.message}</div>
-        ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead style={{ background: "rgba(255,255,255,0.04)" }}>
-              <tr>
-                <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Created</th>
-                <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Txn</th>
-                <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Status</th>
-                <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Decision</th>
-                <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Risk</th>
-                <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Fraud Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              {highRiskRes.data.items.map((row, idx) => {
-                const id = asString(row["id"]);
-                const createdAt = asString(row["created_at"]);
-                const status = asString(row["status"]);
-                const decision = asString(row["decision"]);
-                const riskScore = row["risk_score"];
-                const fraudType = asString(row["fraud_type"]);
-                return (
-                  <tr key={id ?? `${createdAt ?? "na"}-${idx}`} style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                    <td style={{ padding: 10, fontSize: 12 }}>{createdAt ? new Date(createdAt).toLocaleString() : "-"}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{id ? <Link href={`/transactions/${id}`}>{id}</Link> : "-"}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{status ?? "-"}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>
-                      <RiskBadge decision={decision} />
-                    </td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{typeof riskScore === "number" ? riskScore : "-"}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{fraudType ?? "-"}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </section>
-
-      <section style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, overflow: "hidden" }}>
-        <div style={{ padding: 12, borderBottom: "1px solid rgba(255,255,255,0.12)", fontWeight: 800 }}>
-          Suspicious Receivers (flagged = true)
-        </div>
-        {!flaggedRes.ok ? (
-          <div style={{ padding: 12, color: "#ff4d4d" }}>{flaggedRes.error.message}</div>
-        ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead style={{ background: "rgba(255,255,255,0.04)" }}>
-              <tr>
-                <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Receiver</th>
-                <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Updated</th>
-                <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Flagged</th>
-                <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {flaggedRes.data.items.map((rp, idx) => {
-                const receiverUserId = asString(rp["receiver_user_id"]);
-                const updatedAt = asString(rp["updated_at"]);
-                const flagged = asBool(rp["flagged"]);
-                return (
-                  <tr
-                    key={receiverUserId ?? `${updatedAt ?? "na"}-${idx}`}
-                    style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
-                  >
-                    <td style={{ padding: 10, fontSize: 12 }}>{receiverUserId ?? "-"}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{updatedAt ? new Date(updatedAt).toLocaleString() : "-"}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{flagged ? "true" : "false"}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>
-                      {receiverUserId ? (
-                        <ReceiverFlagToggle
-                          receiverId={receiverUserId}
-                          initialFlagged={flagged}
-                          disabled={admin?.role !== "super_admin"}
-                        />
-                      ) : null}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
       </section>
     </div>
   );

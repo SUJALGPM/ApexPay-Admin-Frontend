@@ -24,56 +24,78 @@ export default async function AuditLogsPage({
   const res = await adminApiFetchServer<AuditRes>(`/audit-logs?${qs.toString()}`, { method: "GET" });
 
   return (
-    <div style={{ maxWidth: 1400 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Audit Logs</h1>
+    <div className="ap-container" style={{ maxWidth: 1400 }}>
+      <div className="ap-title ap-titleGradient">Audit Logs</div>
+      <div className="ap-subtitle">Immutable audit trail for operational actions and events.</div>
 
-      <form method="get" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, alignItems: "end", marginBottom: 14 }}>
-        <div>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>Txn ID</div>
-          <input name="txn_id" defaultValue={qp(sp, "txn_id") ?? ""} style={{ width: "100%" }} />
+      <form method="get" className="ap-card ap-glowBorder" style={{ marginTop: 14 }}>
+        <div className="ap-cardInner">
+          <div className="ap-filterGrid">
+            <div className="ap-filterColWide">
+              <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>Txn ID</div>
+              <input name="txn_id" defaultValue={qp(sp, "txn_id") ?? ""} className="ap-input" />
+            </div>
+            <div className="ap-filterColWide">
+              <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>Action</div>
+              <input name="action" defaultValue={qp(sp, "action") ?? ""} className="ap-input" />
+            </div>
+            <div className="ap-filterColWide">
+              <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>From (ISO)</div>
+              <input name="from" defaultValue={qp(sp, "from") ?? ""} className="ap-input" />
+            </div>
+            <div className="ap-filterActions">
+              <button className="ap-button ap-buttonPrimary" style={{ width: "100%" }}>
+                Apply
+              </button>
+            </div>
+          </div>
         </div>
-        <div>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>Action</div>
-          <input name="action" defaultValue={qp(sp, "action") ?? ""} style={{ width: "100%" }} />
-        </div>
-        <div>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>From (ISO)</div>
-          <input name="from" defaultValue={qp(sp, "from") ?? ""} style={{ width: "100%" }} />
-        </div>
-        <button style={{ padding: "10px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.06)", cursor: "pointer", color: "inherit", fontWeight: 700 }}>
-          Apply
-        </button>
       </form>
 
       {!res.ok ? (
-        <div style={{ color: "#ff4d4d" }}>{res.error.message}</div>
+        <div className="ap-card ap-glowBorder" style={{ marginTop: 14 }}>
+          <div className="ap-cardInner ap-alert ap-alertError">{res.error.message}</div>
+        </div>
       ) : (
         <>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 8 }}>
+          <div className="ap-subtitle" style={{ marginTop: 12 }}>
             Range: {new Date(res.data.range.from).toLocaleString()} → {new Date(res.data.range.to).toLocaleString()}
           </div>
-          <div style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, overflow: "hidden" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead style={{ background: "rgba(255,255,255,0.04)" }}>
-                <tr>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Created</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Action</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Txn</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>ID</th>
-                </tr>
-              </thead>
-              <tbody>
-                {res.data.items.map((a) => (
-                  <tr key={a.id} style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                    <td style={{ padding: 10, fontSize: 12 }}>{new Date(a.created_at).toLocaleString()}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{a.action}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{a.txn_id ?? "-"}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{a.id}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+
+          {res.data.items.length === 0 ? (
+            <div className="ap-card ap-glowBorder" style={{ marginTop: 12 }}>
+              <div className="ap-cardInner ap-alert" style={{ color: "var(--muted)" }}>
+                No audit logs found for the current filters.
+              </div>
+            </div>
+          ) : (
+            <div className="ap-card ap-glowBorder ap-tableWrap" style={{ marginTop: 12 }}>
+              <div className="ap-cardInner">
+                <table className="ap-table">
+                  <thead className="ap-thead">
+                    <tr>
+                      <th>Created</th>
+                      <th>Action</th>
+                      <th>Txn</th>
+                      <th>ID</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {res.data.items.map((a) => (
+                      <tr key={a.id} className="ap-row">
+                        <td>{new Date(a.created_at).toLocaleString()}</td>
+                        <td>
+                          <span className="ap-pill">{a.action}</span>
+                        </td>
+                        <td>{a.txn_id ?? "-"}</td>
+                        <td style={{ opacity: 0.85 }}>{a.id}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

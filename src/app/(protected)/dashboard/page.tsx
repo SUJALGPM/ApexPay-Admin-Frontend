@@ -1,6 +1,6 @@
 import { adminApiFetchServer } from "../../../lib/adminApiServer";
 import { getMe } from "../../../lib/auth";
-import { TransactionsLineChart, BreakdownBarChart } from "../../../components/Charts";
+import { BreakdownBarChart, DonutChart, MetricKpiCard, TransactionsLineChart } from "../../../components/Charts";
 
 type DashboardResponse = {
   kpis: {
@@ -15,10 +15,6 @@ type DashboardResponse = {
   fraudTypes: Array<{ fraud_type: string; count: number }>;
   range: { from: string; to: string };
 };
-
-function formatPct(v: number) {
-  return `${(v * 100).toFixed(2)}%`;
-}
 
 export default async function DashboardPage({
   searchParams
@@ -40,10 +36,13 @@ export default async function DashboardPage({
 
   if (!res.ok) {
     return (
-      <div style={{ maxWidth: 1000 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Dashboard</h1>
-        <div style={{ color: "#ff4d4d" }}>
-          {res.error.code === "FORBIDDEN" ? "Forbidden for your role." : res.error.message}
+      <div className="ap-container" style={{ maxWidth: 1200 }}>
+        <div className="ap-title ap-titleGradient">Dashboard</div>
+        <div className="ap-subtitle">Overview of transactions, fraud signals, and system risk.</div>
+        <div className="ap-card ap-glowBorder" style={{ marginTop: 14 }}>
+          <div className="ap-cardInner" style={{ color: "var(--danger)", fontWeight: 760 }}>
+            {res.error.code === "FORBIDDEN" ? "Forbidden for your role." : res.error.message}
+          </div>
         </div>
       </div>
     );
@@ -53,48 +52,58 @@ export default async function DashboardPage({
   const statusRows = Object.entries(kpis.statusBreakdown).map(([status, count]) => ({ status, count }));
 
   return (
-    <div style={{ maxWidth: 1200 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 12 }}>Dashboard</h1>
+    <div className="ap-container" style={{ maxWidth: 1320 }}>
+      <div className="ap-title ap-titleGradient">Dashboard</div>
+      <div className="ap-subtitle">
+        Range: {new Date(res.data.range.from).toLocaleDateString()} → {new Date(res.data.range.to).toLocaleDateString()}
+      </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10, marginBottom: 16 }}>
-        <div style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: 12 }}>
-          <div style={{ fontSize: 12, opacity: 0.7 }}>Total Transactions</div>
-          <div style={{ fontSize: 22, fontWeight: 800 }}>{kpis.totalTransactions}</div>
+      <div className="ap-metrics" style={{ marginTop: 14 }}>
+        <div className="ap-metricCol">
+          <MetricKpiCard label="Total Transactions" value={kpis.totalTransactions} tone="primary" />
         </div>
-        <div style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: 12 }}>
-          <div style={{ fontSize: 12, opacity: 0.7 }}>Fraud Rate (HIGH / total)</div>
-          <div style={{ fontSize: 22, fontWeight: 800 }}>{formatPct(kpis.fraudRate)}</div>
+        <div className="ap-metricCol">
+          <MetricKpiCard
+            label="Fraud Rate"
+            sublabel="HIGH_RISK / total"
+            value={kpis.fraudRate}
+            tone="danger"
+            format="pct"
+          />
         </div>
-        <div style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: 12 }}>
-          <div style={{ fontSize: 12, opacity: 0.7 }}>HOLD Rate</div>
-          <div style={{ fontSize: 22, fontWeight: 800 }}>{formatPct(kpis.holdRate)}</div>
+        <div className="ap-metricCol">
+          <MetricKpiCard label="Hold Rate" value={kpis.holdRate} tone="warning" format="pct" />
         </div>
-        <div style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: 12 }}>
-          <div style={{ fontSize: 12, opacity: 0.7 }}>Recovery Count</div>
-          <div style={{ fontSize: 22, fontWeight: 800 }}>{kpis.recoveryCount}</div>
-        </div>
-        <div style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: 12 }}>
-          <div style={{ fontSize: 12, opacity: 0.7 }}>Range</div>
-          <div style={{ fontSize: 12, fontWeight: 700, marginTop: 6 }}>
-            {new Date(res.data.range.from).toLocaleDateString()} → {new Date(res.data.range.to).toLocaleDateString()}
-          </div>
+        <div className="ap-metricCol">
+          <MetricKpiCard label="Recovery Count" value={kpis.recoveryCount} tone="success" />
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 16 }}>
-        <section style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: 12 }}>
-          <div style={{ fontWeight: 800, marginBottom: 8 }}>Transactions per day</div>
-          <TransactionsLineChart data={res.data.daily} />
+      <div className="ap-grid" style={{ marginTop: 14 }}>
+        <section className="ap-card ap-glowBorder">
+          <div className="ap-cardInner">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
+              <div style={{ fontWeight: 900, letterSpacing: "-0.02em" }}>Transactions per day</div>
+              <span className="ap-pill">Smooth curves • gradient fill</span>
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <TransactionsLineChart data={res.data.daily} />
+            </div>
+          </div>
         </section>
 
-        <section style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          <div style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: 12 }}>
-            <div style={{ fontWeight: 800, marginBottom: 8 }}>Status Breakdown</div>
-            <BreakdownBarChart data={statusRows} xKey="status" yKey="count" />
+        <section className="ap-twoCol">
+          <div className="ap-card ap-glowBorder">
+            <div className="ap-cardInner">
+              <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>Status Breakdown</div>
+              <BreakdownBarChart data={statusRows} xKey="status" yKey="count" />
+            </div>
           </div>
-          <div style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, padding: 12 }}>
-            <div style={{ fontWeight: 800, marginBottom: 8 }}>Risk Decision Distribution</div>
-            <BreakdownBarChart data={res.data.riskDistribution} xKey="decision" yKey="count" />
+          <div className="ap-card ap-glowBorder">
+            <div className="ap-cardInner">
+              <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>Risk Distribution</div>
+              <DonutChart data={res.data.riskDistribution} labelKey="decision" valueKey="count" />
+            </div>
           </div>
         </section>
       </div>

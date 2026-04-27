@@ -34,31 +34,41 @@ export function CreateAdminForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} style={{ display: "grid", gridTemplateColumns: "2fr 2fr 1fr 1fr", gap: 10, alignItems: "end" }}>
-      <div>
-        <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>Email</div>
-        <input value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: "100%" }} />
+    <form onSubmit={onSubmit}>
+      <div className="ap-filterGrid">
+        <div className="ap-filterColWide">
+          <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>Email</div>
+          <input value={email} onChange={(e) => setEmail(e.target.value)} className="ap-input" />
+        </div>
+        <div className="ap-filterColWide">
+          <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>Password (min 12)</div>
+          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" className="ap-input" />
+        </div>
+        <div className="ap-filterCol">
+          <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>Role</div>
+          <select value={role} onChange={(e) => setRole(e.target.value as typeof role)} className="ap-input ap-select">
+            <option value="analyst">analyst</option>
+            <option value="support">support</option>
+            <option value="super_admin">super_admin</option>
+          </select>
+        </div>
+        <div className="ap-filterActions">
+          <button className="ap-button ap-buttonPrimary" disabled={loading} style={{ width: "100%" }}>
+            {loading ? "Creating..." : "Create"}
+          </button>
+        </div>
       </div>
-      <div>
-        <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>Password (min 12)</div>
-        <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" style={{ width: "100%" }} />
-      </div>
-      <div>
-        <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>Role</div>
-        <select value={role} onChange={(e) => setRole(e.target.value as typeof role)} style={{ width: "100%" }}>
-          <option value="analyst">analyst</option>
-          <option value="support">support</option>
-          <option value="super_admin">super_admin</option>
-        </select>
-      </div>
-      <button style={{ padding: "10px 12px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(96,165,250,0.2)", cursor: "pointer", color: "inherit", fontWeight: 800 }} disabled={loading}>
-        {loading ? "Creating..." : "Create"}
-      </button>
-      <div style={{ gridColumn: "1 / -1", fontSize: 12 }}>
-        {error ? <span style={{ color: "#ff4d4d" }}>{error}</span> : null}
-        {success ? <span style={{ color: "#22c55e" }}>{success}</span> : null}
-      </div>
+
+      {error ? (
+        <div className="ap-alert ap-alertError" style={{ marginTop: 12 }}>
+          {error}
+        </div>
+      ) : null}
+      {success ? (
+        <div className="ap-alert ap-alertSuccess" style={{ marginTop: 12 }}>
+          {success}
+        </div>
+      ) : null}
     </form>
   );
 }
-

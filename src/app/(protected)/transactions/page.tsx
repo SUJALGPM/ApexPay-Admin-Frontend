@@ -52,99 +52,101 @@ export default async function TransactionsPage({
   const res = await adminApiFetchServer<TxnListResponse>(`/transactions?${qs.toString()}`, { method: "GET" });
 
   return (
-    <div style={{ maxWidth: 1400 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Transactions</h1>
+    <div className="ap-container" style={{ maxWidth: 1400 }}>
+      <div className="ap-title ap-titleGradient">Transactions</div>
+      <div className="ap-subtitle">Search and filter transactions with risk metadata and fraud signals.</div>
 
-      <form
-        method="get"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(6, 1fr)",
-          gap: 10,
-          alignItems: "end",
-          marginBottom: 14
-        }}
-      >
-        <div>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>Status</div>
-          <input name="status" defaultValue={qp(sp, "status") ?? ""} style={{ width: "100%" }} />
+      <form method="get" className="ap-card ap-glowBorder" style={{ marginTop: 14 }}>
+        <div className="ap-cardInner">
+          <div className="ap-filterGrid">
+            <div className="ap-filterColWide">
+              <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>Status</div>
+              <input name="status" defaultValue={qp(sp, "status") ?? ""} className="ap-input" />
+            </div>
+            <div className="ap-filterColWide">
+              <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>Decision</div>
+              <input name="decision" defaultValue={qp(sp, "decision") ?? ""} className="ap-input" />
+            </div>
+            <div className="ap-filterColWide">
+              <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>Fraud Type</div>
+              <input name="fraud_type" defaultValue={qp(sp, "fraud_type") ?? ""} className="ap-input" />
+            </div>
+            <div className="ap-filterCol">
+              <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>Min Risk</div>
+              <input name="min_risk_score" defaultValue={qp(sp, "min_risk_score") ?? ""} className="ap-input" />
+            </div>
+            <div className="ap-filterCol">
+              <div style={{ fontSize: 12, color: "var(--muted2)", marginBottom: 6 }}>Max Risk</div>
+              <input name="max_risk_score" defaultValue={qp(sp, "max_risk_score") ?? ""} className="ap-input" />
+            </div>
+            <div className="ap-filterActions">
+              <button className="ap-button ap-buttonPrimary" style={{ width: "100%" }}>
+                Apply
+              </button>
+            </div>
+          </div>
         </div>
-        <div>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>Decision</div>
-          <input name="decision" defaultValue={qp(sp, "decision") ?? ""} style={{ width: "100%" }} />
-        </div>
-        <div>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>Fraud Type</div>
-          <input name="fraud_type" defaultValue={qp(sp, "fraud_type") ?? ""} style={{ width: "100%" }} />
-        </div>
-        <div>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>Min Risk</div>
-          <input name="min_risk_score" defaultValue={qp(sp, "min_risk_score") ?? ""} style={{ width: "100%" }} />
-        </div>
-        <div>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>Max Risk</div>
-          <input name="max_risk_score" defaultValue={qp(sp, "max_risk_score") ?? ""} style={{ width: "100%" }} />
-        </div>
-        <button
-          style={{
-            padding: "10px 12px",
-            borderRadius: 8,
-            border: "1px solid rgba(255,255,255,0.12)",
-            background: "rgba(255,255,255,0.06)",
-            cursor: "pointer",
-            color: "inherit",
-            fontWeight: 700
-          }}
-        >
-          Apply
-        </button>
       </form>
 
       {!res.ok ? (
-        <div style={{ color: "#ff4d4d" }}>{res.error.message}</div>
+        <div className="ap-card ap-glowBorder" style={{ marginTop: 14 }}>
+          <div className="ap-cardInner ap-alert ap-alertError">{res.error.message}</div>
+        </div>
       ) : (
         <>
-          <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 8 }}>
+          <div className="ap-subtitle" style={{ marginTop: 12 }}>
             Range: {new Date(res.data.range.from).toLocaleString()} → {new Date(res.data.range.to).toLocaleString()}
           </div>
-          <div style={{ border: "1px solid rgba(255,255,255,0.12)", borderRadius: 12, overflow: "hidden" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead style={{ background: "rgba(255,255,255,0.04)" }}>
-                <tr>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Created</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Txn</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Status</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Amount</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Decision</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Risk</th>
-                  <th style={{ textAlign: "left", padding: 10, fontSize: 12 }}>Fraud Type</th>
-                </tr>
-              </thead>
-              <tbody>
-                {res.data.items.map((t) => (
-                  <tr key={t.id} style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                    <td style={{ padding: 10, fontSize: 12, opacity: 0.9 }}>
-                      {new Date(t.created_at).toLocaleString()}
-                    </td>
-                    <td style={{ padding: 10, fontSize: 12 }}>
-                      <Link href={`/transactions/${t.id}`}>{t.id}</Link>
-                    </td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{t.status}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{t.amount ?? "-"}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>
-                      <RiskBadge decision={t.decision} />
-                    </td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{t.risk_score ?? "-"}</td>
-                    <td style={{ padding: 10, fontSize: 12 }}>{t.fraud_type ?? "-"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+
+          {res.data.items.length === 0 ? (
+            <div className="ap-card ap-glowBorder" style={{ marginTop: 12 }}>
+              <div className="ap-cardInner ap-alert" style={{ color: "var(--muted)" }}>
+                No transactions found for the current filters.
+              </div>
+            </div>
+          ) : (
+            <div className="ap-card ap-glowBorder ap-tableWrap" style={{ marginTop: 12 }}>
+              <div className="ap-cardInner">
+                <table className="ap-table">
+                  <thead className="ap-thead">
+                    <tr>
+                      <th>Created</th>
+                      <th>Txn</th>
+                      <th>Status</th>
+                      <th>Amount</th>
+                      <th>Decision</th>
+                      <th>Risk</th>
+                      <th>Fraud Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {res.data.items.map((t) => (
+                      <tr key={t.id} className="ap-row">
+                        <td style={{ opacity: 0.9 }}>{new Date(t.created_at).toLocaleString()}</td>
+                        <td>
+                          <Link href={`/transactions/${t.id}`} style={{ textDecoration: "underline" }}>
+                            {t.id}
+                          </Link>
+                        </td>
+                        <td>{t.status}</td>
+                        <td>{t.amount ?? "-"}</td>
+                        <td>
+                          <RiskBadge decision={t.decision} />
+                        </td>
+                        <td>{t.risk_score ?? "-"}</td>
+                        <td>{t.fraud_type ?? "-"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {res.data.page.nextCursor ? (
             <div style={{ marginTop: 12 }}>
               <Link
+                className="ap-button"
                 href={`/transactions?${new URLSearchParams({ ...Object.fromEntries(qs), cursor: res.data.page.nextCursor }).toString()}`}
               >
                 Load more →
