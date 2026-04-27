@@ -50,7 +50,7 @@ export default async function UsersPage({
         </div>
       ) : (
         <div className="ap-twoCol" style={{ marginTop: 14 }}>
-          <section className="ap-card ap-glowBorder">
+          <section className="ap-card ap-glowBorder ap-tableWrap">
             <div className="ap-cardInner">
               <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>User List</div>
               {listRes.data.items.length === 0 ? (
@@ -58,30 +58,32 @@ export default async function UsersPage({
                   No users found.
                 </div>
               ) : (
-                <table className="ap-table">
-                  <thead className="ap-thead">
-                    <tr>
-                      <th>Created</th>
-                      <th>Mobile</th>
-                      <th>Name</th>
-                      <th>User</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {listRes.data.items.map((u) => (
-                      <tr key={u.id} className="ap-row">
-                        <td>{new Date(u.created_at).toLocaleString()}</td>
-                        <td>{u.mobile_number ?? "-"}</td>
-                        <td>{u.full_name ?? "-"}</td>
-                        <td>
-                          <Link href={`/users?user_id=${u.id}`} style={{ textDecoration: "underline" }}>
-                            {u.id}
-                          </Link>
-                        </td>
+                <div className="ap-tableScroll">
+                  <table className="ap-table">
+                    <thead className="ap-thead">
+                      <tr>
+                        <th>Created</th>
+                        <th>Mobile</th>
+                        <th>Name</th>
+                        <th>User</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {listRes.data.items.map((u) => (
+                        <tr key={u.id} className="ap-row">
+                          <td>{new Date(u.created_at).toLocaleString()}</td>
+                          <td>{u.mobile_number ?? "-"}</td>
+                          <td>{u.full_name ?? "-"}</td>
+                          <td>
+                            <Link href={`/users?user_id=${u.id}`} style={{ textDecoration: "underline" }}>
+                              {u.id}
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
               {listRes.data.page.nextCursor ? (
                 <div style={{ marginTop: 10 }}>

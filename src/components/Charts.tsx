@@ -80,7 +80,7 @@ export function MetricKpiCard({
           <span>{label}</span>
         </div>
         <div className="ap-metricValue">{display}</div>
-        {sublabel ? <div style={{ marginTop: 8, fontSize: 12, color: "var(--muted)" }}>{sublabel}</div> : null}
+        <div className="ap-metricSublabel">{sublabel ?? ""}</div>
       </div>
     </div>
   );
@@ -103,7 +103,7 @@ function GlassTooltip({
         padding: 10,
         borderRadius: 14,
         borderColor: "rgba(255,255,255,0.16)",
-        background: "rgba(15,23,42,0.55)"
+        background: "rgba(2,6,23,0.62)"
       }}
     >
       <div style={{ fontSize: 12, fontWeight: 800, marginBottom: 6 }}>{label}</div>
@@ -182,12 +182,12 @@ export function TransactionsLineChart({
         <AreaChart data={computed} margin={{ left: 6, right: 6, top: 8, bottom: 8 }}>
           <defs>
             <linearGradient id="apTotalFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(99,102,241,0.40)" />
-              <stop offset="100%" stopColor="rgba(99,102,241,0.02)" />
+              <stop offset="0%" stopColor="rgba(0,180,216,0.22)" />
+              <stop offset="100%" stopColor="rgba(0,180,216,0.00)" />
             </linearGradient>
             <linearGradient id="apRiskFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(236,72,153,0.30)" />
-              <stop offset="100%" stopColor="rgba(236,72,153,0.02)" />
+              <stop offset="0%" stopColor="rgba(255,77,109,0.18)" />
+              <stop offset="100%" stopColor="rgba(255,77,109,0.00)" />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.10)" />
@@ -198,20 +198,20 @@ export function TransactionsLineChart({
           <Area
             type="monotone"
             dataKey="total"
-            stroke="rgba(99,102,241,1)"
+            stroke="#00b4d8"
             strokeWidth={2.4}
             fill="url(#apTotalFill)"
-            dot={{ r: 2.8, strokeWidth: 0, fill: "rgba(34,211,238,0.95)" }}
+            dot={{ r: 2.8, stroke: "rgba(0,180,216,0.35)", strokeWidth: 8, fill: "#00b4d8" }}
             isAnimationActive
             animationDuration={900}
           />
           <Area
             type="monotone"
             dataKey="highRisk"
-            stroke="rgba(236,72,153,1)"
+            stroke="#ff4d6d"
             strokeWidth={2.2}
             fill="url(#apRiskFill)"
-            dot={{ r: 2.6, strokeWidth: 0, fill: "rgba(236,72,153,0.95)" }}
+            dot={{ r: 2.6, stroke: "rgba(255,77,109,0.28)", strokeWidth: 8, fill: "#ff4d6d" }}
             isAnimationActive
             animationDuration={900}
           />
@@ -237,9 +237,9 @@ export function BreakdownBarChart({
         <BarChart data={data}>
           <defs>
             <linearGradient id="apBarFill" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="rgba(34,211,238,0.85)" />
-              <stop offset="50%" stopColor="rgba(99,102,241,0.85)" />
-              <stop offset="100%" stopColor="rgba(139,92,246,0.85)" />
+              <stop offset="0%" stopColor="rgba(0,119,182,0.92)" />
+              <stop offset="55%" stopColor="rgba(0,180,216,0.92)" />
+              <stop offset="100%" stopColor="rgba(144,224,239,0.92)" />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.10)" />
@@ -267,7 +267,7 @@ export function DonutChart({
     return data.reduce((acc, row) => acc + Number(row[valueKey] ?? 0), 0);
   }, [data, valueKey]);
 
-  const colors = ["rgba(99,102,241,0.95)", "rgba(34,211,238,0.95)", "rgba(139,92,246,0.95)", "rgba(236,72,153,0.92)"];
+  const colors = ["#00b4d8", "#0077b6", "#90e0ef", "#caf0f8"];
 
   return (
     <div style={{ width: "100%", height: 320 }}>

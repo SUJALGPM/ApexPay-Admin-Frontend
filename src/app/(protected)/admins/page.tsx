@@ -37,28 +37,30 @@ export default async function AdminsPage() {
                   No admins found.
                 </div>
               ) : (
-                <table className="ap-table">
-                  <thead className="ap-thead">
-                    <tr>
-                      <th>Created</th>
-                      <th>Email</th>
-                      <th>Role</th>
-                      <th>ID</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {res.data.items.map((a) => (
-                      <tr key={a.id} className="ap-row">
-                        <td>{new Date(a.created_at).toLocaleString()}</td>
-                        <td>{a.email}</td>
-                        <td>
-                          <span className="ap-pill">{a.role}</span>
-                        </td>
-                        <td style={{ opacity: 0.85 }}>{a.id}</td>
+                <div className="ap-tableScroll">
+                  <table className="ap-table">
+                    <thead className="ap-thead">
+                      <tr>
+                        <th>Created</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>ID</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {res.data.items.map((a) => (
+                        <tr key={a.id} className="ap-row">
+                          <td>{new Date(a.created_at).toLocaleString()}</td>
+                          <td>{a.email}</td>
+                          <td>
+                            <span className="ap-pill">{a.role}</span>
+                          </td>
+                          <td style={{ opacity: 0.85 }}>{a.id}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           </section>

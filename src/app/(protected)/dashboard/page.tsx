@@ -81,7 +81,7 @@ export default async function DashboardPage({
 
       <div className="ap-grid" style={{ marginTop: 14 }}>
         <section className="ap-card ap-glowBorder">
-          <div className="ap-cardInner">
+          <div className="ap-cardInner ap-clip">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
               <div style={{ fontWeight: 900, letterSpacing: "-0.02em" }}>Transactions per day</div>
               <span className="ap-pill">Smooth curves • gradient fill</span>
@@ -94,13 +94,13 @@ export default async function DashboardPage({
 
         <section className="ap-twoCol">
           <div className="ap-card ap-glowBorder">
-            <div className="ap-cardInner">
+            <div className="ap-cardInner ap-clip">
               <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>Status Breakdown</div>
               <BreakdownBarChart data={statusRows} xKey="status" yKey="count" />
             </div>
           </div>
           <div className="ap-card ap-glowBorder">
-            <div className="ap-cardInner">
+            <div className="ap-cardInner ap-clip">
               <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>Risk Distribution</div>
               <DonutChart data={res.data.riskDistribution} labelKey="decision" valueKey="count" />
             </div>

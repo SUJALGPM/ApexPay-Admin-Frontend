@@ -263,7 +263,7 @@ export function Shell({
         </div>
       </aside>
 
-      <div>
+      <div className="ap-main">
         <div className="ap-topbar">
           <div className="ap-topbarInner">
             <button className="ap-iconButton" onClick={() => setSidebarOpen((v) => !v)} type="button">

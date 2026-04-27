@@ -75,28 +75,30 @@ export default async function NotificationsPage({
           ) : (
             <div className="ap-card ap-glowBorder ap-tableWrap" style={{ marginTop: 12 }}>
               <div className="ap-cardInner">
-                <table className="ap-table">
-                  <thead className="ap-thead">
-                    <tr>
-                      <th>Created</th>
-                      <th>Type</th>
-                      <th>User</th>
-                      <th>ID</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {res.data.items.map((n) => (
-                      <tr key={n.id} className="ap-row">
-                        <td>{new Date(n.created_at).toLocaleString()}</td>
-                        <td>
-                          <span className="ap-pill">{n.type}</span>
-                        </td>
-                        <td>{n.user_id ?? "-"}</td>
-                        <td style={{ opacity: 0.85 }}>{n.id}</td>
+                <div className="ap-tableScroll">
+                  <table className="ap-table">
+                    <thead className="ap-thead">
+                      <tr>
+                        <th>Created</th>
+                        <th>Type</th>
+                        <th>User</th>
+                        <th>ID</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {res.data.items.map((n) => (
+                        <tr key={n.id} className="ap-row">
+                          <td>{new Date(n.created_at).toLocaleString()}</td>
+                          <td>
+                            <span className="ap-pill">{n.type}</span>
+                          </td>
+                          <td>{n.user_id ?? "-"}</td>
+                          <td style={{ opacity: 0.85 }}>{n.id}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}

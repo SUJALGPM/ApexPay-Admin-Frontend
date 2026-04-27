@@ -57,13 +57,13 @@ export default async function FraudPage({
 
       <section className="ap-twoCol" style={{ marginTop: 14 }}>
         <div className="ap-card ap-glowBorder">
-          <div className="ap-cardInner">
+          <div className="ap-cardInner ap-clip">
             <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>Risk Distribution</div>
             {!dashRes.ok ? <div className="ap-alert ap-alertError">{dashRes.error.message}</div> : <BreakdownBarChart data={dashRes.data.riskDistribution} xKey="decision" yKey="count" />}
           </div>
         </div>
         <div className="ap-card ap-glowBorder">
-          <div className="ap-cardInner">
+          <div className="ap-cardInner ap-clip">
             <div style={{ fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 10 }}>Fraud Type Breakdown</div>
             {!dashRes.ok ? <div className="ap-alert ap-alertError">{dashRes.error.message}</div> : <BreakdownBarChart data={dashRes.data.fraudTypes} xKey="fraud_type" yKey="count" />}
           </div>
@@ -80,48 +80,50 @@ export default async function FraudPage({
               No high-risk transactions found for the selected range.
             </div>
           ) : (
-            <table className="ap-table">
-              <thead className="ap-thead">
-                <tr>
-                  <th>Created</th>
-                  <th>Txn</th>
-                  <th>Status</th>
-                  <th>Decision</th>
-                  <th>Risk</th>
-                  <th>Fraud Type</th>
-                </tr>
-              </thead>
-              <tbody>
-                {highRiskRes.data.items.map((row, idx) => {
-                  const id = asString(row["id"]);
-                  const createdAt = asString(row["created_at"]);
-                  const status = asString(row["status"]);
-                  const decision = asString(row["decision"]);
-                  const riskScore = row["risk_score"];
-                  const fraudType = asString(row["fraud_type"]);
-                  return (
-                    <tr key={id ?? `${createdAt ?? "na"}-${idx}`} className="ap-row">
-                      <td>{createdAt ? new Date(createdAt).toLocaleString() : "-"}</td>
-                      <td>
-                        {id ? (
-                          <Link href={`/transactions/${id}`} style={{ textDecoration: "underline" }}>
-                            {id}
-                          </Link>
-                        ) : (
-                          "-"
-                        )}
-                      </td>
-                      <td>{status ?? "-"}</td>
-                      <td>
-                        <RiskBadge decision={decision} />
-                      </td>
-                      <td>{typeof riskScore === "number" ? riskScore : "-"}</td>
-                      <td>{fraudType ?? "-"}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="ap-tableScroll">
+              <table className="ap-table">
+                <thead className="ap-thead">
+                  <tr>
+                    <th>Created</th>
+                    <th>Txn</th>
+                    <th>Status</th>
+                    <th>Decision</th>
+                    <th>Risk</th>
+                    <th>Fraud Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {highRiskRes.data.items.map((row, idx) => {
+                    const id = asString(row["id"]);
+                    const createdAt = asString(row["created_at"]);
+                    const status = asString(row["status"]);
+                    const decision = asString(row["decision"]);
+                    const riskScore = row["risk_score"];
+                    const fraudType = asString(row["fraud_type"]);
+                    return (
+                      <tr key={id ?? `${createdAt ?? "na"}-${idx}`} className="ap-row">
+                        <td>{createdAt ? new Date(createdAt).toLocaleString() : "-"}</td>
+                        <td>
+                          {id ? (
+                            <Link href={`/transactions/${id}`} style={{ textDecoration: "underline" }}>
+                              {id}
+                            </Link>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                        <td>{status ?? "-"}</td>
+                        <td>
+                          <RiskBadge decision={decision} />
+                        </td>
+                        <td>{typeof riskScore === "number" ? riskScore : "-"}</td>
+                        <td>{fraudType ?? "-"}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </section>
@@ -136,35 +138,37 @@ export default async function FraudPage({
               No flagged receivers at the moment.
             </div>
           ) : (
-            <table className="ap-table">
-              <thead className="ap-thead">
-                <tr>
-                  <th>Receiver</th>
-                  <th>Updated</th>
-                  <th>Flagged</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {flaggedRes.data.items.map((rp, idx) => {
-                  const receiverUserId = asString(rp["receiver_user_id"]);
-                  const updatedAt = asString(rp["updated_at"]);
-                  const flagged = asBool(rp["flagged"]);
-                  return (
-                    <tr key={receiverUserId ?? `${updatedAt ?? "na"}-${idx}`} className="ap-row">
-                      <td>{receiverUserId ?? "-"}</td>
-                      <td>{updatedAt ? new Date(updatedAt).toLocaleString() : "-"}</td>
-                      <td>{flagged ? "true" : "false"}</td>
-                      <td>
-                        {receiverUserId ? (
-                          <ReceiverFlagToggle receiverId={receiverUserId} initialFlagged={flagged} disabled={admin?.role !== "super_admin"} />
-                        ) : null}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="ap-tableScroll">
+              <table className="ap-table">
+                <thead className="ap-thead">
+                  <tr>
+                    <th>Receiver</th>
+                    <th>Updated</th>
+                    <th>Flagged</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {flaggedRes.data.items.map((rp, idx) => {
+                    const receiverUserId = asString(rp["receiver_user_id"]);
+                    const updatedAt = asString(rp["updated_at"]);
+                    const flagged = asBool(rp["flagged"]);
+                    return (
+                      <tr key={receiverUserId ?? `${updatedAt ?? "na"}-${idx}`} className="ap-row">
+                        <td>{receiverUserId ?? "-"}</td>
+                        <td>{updatedAt ? new Date(updatedAt).toLocaleString() : "-"}</td>
+                        <td>{flagged ? "true" : "false"}</td>
+                        <td>
+                          {receiverUserId ? (
+                            <ReceiverFlagToggle receiverId={receiverUserId} initialFlagged={flagged} disabled={admin?.role !== "super_admin"} />
+                          ) : null}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </section>

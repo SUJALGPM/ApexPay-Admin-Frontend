@@ -24,7 +24,7 @@ export default async function AuditLogsPage({
   const res = await adminApiFetchServer<AuditRes>(`/audit-logs?${qs.toString()}`, { method: "GET" });
 
   return (
-    <div className="ap-container" style={{ maxWidth: 1400 }}>
+    <div className="ap-container ap-pageFill" style={{ maxWidth: 1400 }}>
       <div className="ap-title ap-titleGradient">Audit Logs</div>
       <div className="ap-subtitle">Immutable audit trail for operational actions and events.</div>
 
@@ -69,30 +69,32 @@ export default async function AuditLogsPage({
               </div>
             </div>
           ) : (
-            <div className="ap-card ap-glowBorder ap-tableWrap" style={{ marginTop: 12 }}>
+            <div className="ap-card ap-glowBorder ap-tableWrap ap-tableCardFill" style={{ marginTop: 12 }}>
               <div className="ap-cardInner">
-                <table className="ap-table">
-                  <thead className="ap-thead">
-                    <tr>
-                      <th>Created</th>
-                      <th>Action</th>
-                      <th>Txn</th>
-                      <th>ID</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {res.data.items.map((a) => (
-                      <tr key={a.id} className="ap-row">
-                        <td>{new Date(a.created_at).toLocaleString()}</td>
-                        <td>
-                          <span className="ap-pill">{a.action}</span>
-                        </td>
-                        <td>{a.txn_id ?? "-"}</td>
-                        <td style={{ opacity: 0.85 }}>{a.id}</td>
+                <div className="ap-tableScroll">
+                  <table className="ap-table">
+                    <thead className="ap-thead">
+                      <tr>
+                        <th>Created</th>
+                        <th>Action</th>
+                        <th>Txn</th>
+                        <th>ID</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {res.data.items.map((a) => (
+                        <tr key={a.id} className="ap-row">
+                          <td>{new Date(a.created_at).toLocaleString()}</td>
+                          <td>
+                            <span className="ap-pill">{a.action}</span>
+                          </td>
+                          <td>{a.txn_id ?? "-"}</td>
+                          <td style={{ opacity: 0.85 }}>{a.id}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}

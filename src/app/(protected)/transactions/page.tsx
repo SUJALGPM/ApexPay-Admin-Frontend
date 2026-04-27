@@ -107,38 +107,40 @@ export default async function TransactionsPage({
           ) : (
             <div className="ap-card ap-glowBorder ap-tableWrap" style={{ marginTop: 12 }}>
               <div className="ap-cardInner">
-                <table className="ap-table">
-                  <thead className="ap-thead">
-                    <tr>
-                      <th>Created</th>
-                      <th>Txn</th>
-                      <th>Status</th>
-                      <th>Amount</th>
-                      <th>Decision</th>
-                      <th>Risk</th>
-                      <th>Fraud Type</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {res.data.items.map((t) => (
-                      <tr key={t.id} className="ap-row">
-                        <td style={{ opacity: 0.9 }}>{new Date(t.created_at).toLocaleString()}</td>
-                        <td>
-                          <Link href={`/transactions/${t.id}`} style={{ textDecoration: "underline" }}>
-                            {t.id}
-                          </Link>
-                        </td>
-                        <td>{t.status}</td>
-                        <td>{t.amount ?? "-"}</td>
-                        <td>
-                          <RiskBadge decision={t.decision} />
-                        </td>
-                        <td>{t.risk_score ?? "-"}</td>
-                        <td>{t.fraud_type ?? "-"}</td>
+                <div className="ap-tableScroll">
+                  <table className="ap-table">
+                    <thead className="ap-thead">
+                      <tr>
+                        <th>Created</th>
+                        <th>Txn</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                        <th>Decision</th>
+                        <th>Risk</th>
+                        <th>Fraud Type</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {res.data.items.map((t) => (
+                        <tr key={t.id} className="ap-row">
+                          <td style={{ opacity: 0.9 }}>{new Date(t.created_at).toLocaleString()}</td>
+                          <td>
+                            <Link href={`/transactions/${t.id}`} style={{ textDecoration: "underline" }}>
+                              {t.id}
+                            </Link>
+                          </td>
+                          <td>{t.status}</td>
+                          <td>{t.amount ?? "-"}</td>
+                          <td>
+                            <RiskBadge decision={t.decision} />
+                          </td>
+                          <td>{t.risk_score ?? "-"}</td>
+                          <td>{t.fraud_type ?? "-"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
